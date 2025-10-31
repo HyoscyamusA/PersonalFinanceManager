@@ -1,16 +1,4 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-//namespace PersonalFinanceManager.DAL
-//{
-//    internal class BudgetRepository
-//    {
-//    }
-//}
-using System;
+﻿using System;
 using System.Data;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
@@ -83,6 +71,10 @@ namespace PersonalFinanceManager.DAL
         public List<Budget> GetBudgetsByMonth(int year, int month)
         {
             var budgets = new List<Budget>();
+
+            // 首先更新实际支出金额
+            UpdateActualAmounts(year, month);
+
             string sql = @"
                 SELECT b.*, c.CategoryName 
                 FROM Budgets b
@@ -127,6 +119,10 @@ namespace PersonalFinanceManager.DAL
         public List<Budget> GetBudgetWarnings()
         {
             var warnings = new List<Budget>();
+
+            // 首先更新所有预算的实际支出
+            UpdateAllActualAmounts();
+
             string sql = @"
                 SELECT b.*, c.CategoryName 
                 FROM Budgets b
@@ -157,6 +153,75 @@ namespace PersonalFinanceManager.DAL
                 warnings.Add(budget);
             }
             return warnings;
+        }
+
+        public bool DeleteBudget(int budgetId)
+        {
+            string sql = "DELETE FROM Budgets WHERE BudgetID = @BudgetID";
+            var parameter = new MySqlParameter("@BudgetID", budgetId);
+            return _dbHelper.ExecuteNonQuery(sql, new[] { parameter }) > 0;
+        }
+
+        /// <summary>
+        /// 更新指定月份所有预算的实际支出金额
+        /// </summary>
+        public void UpdateActualAmounts(int year, int month)
+        {
+            string updateSql = @"
+                UPDATE Budgets b
+                LEFT JOIN (
+                    SELECT 
+                        CategoryID,
+                        YEAR(TransactionTime) as TransYear,
+                        MONTH(TransactionTime) as TransMonth,
+                        SUM(CASE WHEN TransactionType = '支出' THEN Amount ELSE 0 END) as TotalExpense
+                    FROM Transactions 
+                    WHERE TransactionType = '支出'
+                    GROUP BY CategoryID, YEAR(TransactionTime), MONTH(TransactionTime)
+                ) t ON b.CategoryID = t.CategoryID AND b.BudgetYear = t.TransYear AND b.BudgetMonth = t.TransMonth
+                SET 
+                    b.ActualAmount = COALESCE(t.TotalExpense, 0),
+                    b.CompletionRate = CASE 
+                        WHEN b.BudgetAmount > 0 THEN (COALESCE(t.TotalExpense, 0) / b.BudgetAmount) * 100 
+                        ELSE 0 
+                    END
+                WHERE b.BudgetYear = @Year AND b.BudgetMonth = @Month";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Year", year),
+                new MySqlParameter("@Month", month)
+            };
+
+            _dbHelper.ExecuteNonQuery(updateSql, parameters);
+        }
+
+        /// <summary>
+        /// 更新所有预算的实际支出金额
+        /// </summary>
+        private void UpdateAllActualAmounts()
+        {
+            string updateSql = @"
+                UPDATE Budgets b
+                LEFT JOIN (
+                    SELECT 
+                        CategoryID,
+                        YEAR(TransactionTime) as TransYear,
+                        MONTH(TransactionTime) as TransMonth,
+                        SUM(CASE WHEN TransactionType = '支出' THEN Amount ELSE 0 END) as TotalExpense
+                    FROM Transactions 
+                    WHERE TransactionType = '支出'
+                    GROUP BY CategoryID, YEAR(TransactionTime), MONTH(TransactionTime)
+                ) t ON b.CategoryID = t.CategoryID AND b.BudgetYear = t.TransYear AND b.BudgetMonth = t.TransMonth
+                SET 
+                    b.ActualAmount = COALESCE(t.TotalExpense, 0),
+                    b.CompletionRate = CASE 
+                        WHEN b.BudgetAmount > 0 THEN (COALESCE(t.TotalExpense, 0) / b.BudgetAmount) * 100 
+                        ELSE 0 
+                    END
+                WHERE b.Status = '激活'";
+
+            _dbHelper.ExecuteNonQuery(updateSql);
         }
     }
 }

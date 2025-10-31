@@ -9,11 +9,13 @@ namespace PersonalFinanceManager.BLL
     {
         private readonly TransactionRepository _transactionRepository;
         private readonly AccountService _accountService;
+        private readonly BudgetRepository _budgetRepository;
 
         public TransactionService()
         {
             _transactionRepository = new TransactionRepository();
             _accountService = new AccountService();
+            _budgetRepository = new BudgetRepository();
         }
 
         public bool AddTransaction(Transaction transaction)
@@ -34,6 +36,9 @@ namespace PersonalFinanceManager.BLL
                 {
                     // 更新账户余额
                     UpdateAccountBalance(transaction);
+
+                    // 新增：更新预算实际支出
+                    UpdateBudgetActualAmount(transaction.TransactionTime.Year, transaction.TransactionTime.Month);
                 }
                 return result;
             }
@@ -71,6 +76,15 @@ namespace PersonalFinanceManager.BLL
                 {
                     // 应用新交易对账户余额的影响
                     UpdateAccountBalance(transaction);
+
+                    // 新增：更新预算实际支出（两个月份都需要更新）
+                    UpdateBudgetActualAmount(originalTransaction.TransactionTime.Year, originalTransaction.TransactionTime.Month);
+                    if (originalTransaction.TransactionTime.Year != transaction.TransactionTime.Year ||
+                        originalTransaction.TransactionTime.Month != transaction.TransactionTime.Month)
+                    {
+                        // 如果月份发生变化，更新新月份的预算
+                        UpdateBudgetActualAmount(transaction.TransactionTime.Year, transaction.TransactionTime.Month);
+                    }
                 }
                 return result;
             }
@@ -136,9 +150,16 @@ namespace PersonalFinanceManager.BLL
                 {
                     // 反向更新账户余额
                     ReverseAccountBalance(transaction);
-                }
 
-                return _transactionRepository.DeleteTransaction(transactionId);
+                    bool result = _transactionRepository.DeleteTransaction(transactionId);
+                    if (result)
+                    {
+                        // 新增：更新预算实际支出
+                        UpdateBudgetActualAmount(transaction.TransactionTime.Year, transaction.TransactionTime.Month);
+                    }
+                    return result;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -215,6 +236,23 @@ namespace PersonalFinanceManager.BLL
             catch (Exception ex)
             {
                 throw new Exception($"获取所有交易记录失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 新增：更新指定月份预算的实际支出金额
+        /// </summary>
+        private void UpdateBudgetActualAmount(int year, int month)
+        {
+            try
+            {
+                // 调用 BudgetRepository 的方法更新实际支出
+                _budgetRepository.UpdateActualAmounts(year, month);
+            }
+            catch (Exception ex)
+            {
+                // 记录日志，但不抛出异常，避免影响主要交易操作
+                System.Diagnostics.Debug.WriteLine($"更新预算实际支出失败: {ex.Message}");
             }
         }
     }

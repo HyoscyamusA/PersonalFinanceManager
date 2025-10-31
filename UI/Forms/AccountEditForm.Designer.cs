@@ -19,6 +19,9 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        // 添加当前余额的文本框和标签
+        private System.Windows.Forms.TextBox txtCurrentBalance;
+        private System.Windows.Forms.Label label8;
 
         protected override void Dispose(bool disposing)
         {
@@ -50,6 +53,23 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
+
+
+
+            // 在InitializeComponent中初始化控件
+            this.txtCurrentBalance = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            // 设置控件位置、大小等（参考初始金额的布局）
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(29, 113); // 调整位置
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(65, 12);
+            this.label8.Text = "当前余额：";
+            this.txtCurrentBalance.Location = new System.Drawing.Point(100, 110);
+            this.txtCurrentBalance.Name = "txtCurrentBalance";
+            this.txtCurrentBalance.Size = new System.Drawing.Size(200, 21);
+            this.txtCurrentBalance.TabIndex = 3; // 调整 tabindex
+
             // 
             // txtAccountName
             // 

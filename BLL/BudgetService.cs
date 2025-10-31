@@ -79,5 +79,22 @@ namespace PersonalFinanceManager.BLL
                 throw new Exception($"获取预算预警失败: {ex.Message}");
             }
         }
+        // 在 BudgetService 类中添加以下方法
+        public bool DeleteBudget(int budgetId)
+        {
+            if (budgetId <= 0)
+                throw new ArgumentException("预算ID无效");
+
+            try
+            {
+                // 需要在 BudgetRepository 中实现 DeleteBudget 方法
+                return _budgetRepository.DeleteBudget(budgetId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"删除预算失败: {ex.Message}");
+            }
+        }
+
     }
 }

@@ -7,6 +7,10 @@ namespace PersonalFinanceManager.DAL
     public class DatabaseInitializer
     {
         private readonly DatabaseHelper _dbHelper;
+        // 添加一个静态属性来控制是否显示调试信息
+        public static bool ShowDebugMessages { get; set; } = false;
+
+      
 
         public DatabaseInitializer()
         {
@@ -17,24 +21,27 @@ namespace PersonalFinanceManager.DAL
         {
             try
             {
-                MessageBox.Show("开始数据库初始化...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (ShowDebugMessages)
+                {
+                    MessageBox.Show("开始数据库初始化...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // 测试连接
-                MessageBox.Show("正在测试数据库连接...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                _dbHelper.TestConnection();
-                MessageBox.Show("数据库连接测试成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // 测试连接
+                    MessageBox.Show("正在测试数据库连接...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _dbHelper.TestConnection();
+                    MessageBox.Show("数据库连接测试成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // 创建表
-                MessageBox.Show("正在创建数据表...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                CreateTables();
-                MessageBox.Show("数据表创建成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // 创建表
+                    MessageBox.Show("正在创建数据表...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CreateTables();
+                    MessageBox.Show("数据表创建成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // 插入初始数据
-                MessageBox.Show("正在插入初始数据...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                InsertInitialData();
-                MessageBox.Show("初始数据插入成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // 插入初始数据
+                    MessageBox.Show("正在插入初始数据...", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    InsertInitialData();
+                    MessageBox.Show("初始数据插入成功！", "调试信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                MessageBox.Show("MySQL数据库初始化成功！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("MySQL数据库初始化成功！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {

@@ -34,6 +34,8 @@ namespace PersonalFinanceManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // 禁用数据库初始化的调试消息
+            DatabaseInitializer.ShowDebugMessages = false;
             // 初始化数据库
             InitializeDatabase();
 

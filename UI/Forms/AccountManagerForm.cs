@@ -25,6 +25,8 @@ namespace PersonalFinanceManager.UI.Forms
             dataGridViewAccounts.Columns.Add("AccountID", "ID");
             dataGridViewAccounts.Columns.Add("AccountName", "账户名称");
             dataGridViewAccounts.Columns.Add("AccountType", "账户类型");
+            dataGridViewAccounts.Columns.Add("InitialAmount", "初始金额");
+            dataGridViewAccounts.Columns["InitialAmount"].DefaultCellStyle.Format = "C2"; // 显示为货币
             dataGridViewAccounts.Columns.Add("CurrentBalance", "当前余额");
             dataGridViewAccounts.Columns.Add("Currency", "币种");
             dataGridViewAccounts.Columns.Add("BankName", "银行");
@@ -55,6 +57,7 @@ namespace PersonalFinanceManager.UI.Forms
                         account.AccountID,
                         account.AccountName,
                         account.AccountType,
+                        account.InitialAmount,      //新增初始金额列
                         account.CurrentBalance,
                         account.Currency,
                         account.BankName,
@@ -81,11 +84,33 @@ namespace PersonalFinanceManager.UI.Forms
             }
         }
 
+        //private void UpdateStatus()
+        //{
+        //    try
+        //    {
+
+
+        //        // 通过 MainForm 更新总余额
+        //        if (dataGridViewAccounts.Parent is Panel panel && panel.Parent is MainForm mainForm)
+        //        {
+        //            // 获取最新的总余额
+        //            decimal totalBalance = _accountService.GetTotalBalance();
+        //            mainForm.UpdateStatusInfo();  // 不传递参数
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"更新总余额失败: {ex.Message}", "错误",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
+
+        public event Action OnAccountUpdated; // 事件定义
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             try
             {
-                // 创建新增账户对话框
                 using (var form = new AccountEditForm())
                 {
                     if (form.ShowDialog() == DialogResult.OK)
@@ -93,6 +118,8 @@ namespace PersonalFinanceManager.UI.Forms
                         LoadAccounts();
                         MessageBox.Show("账户添加成功！", "成功",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
                     }
                 }
             }
@@ -102,6 +129,28 @@ namespace PersonalFinanceManager.UI.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        //private void btnAdd_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        // 创建新增账户对话框
+        //        using (var form = new AccountEditForm())
+        //        {
+        //            if (form.ShowDialog() == DialogResult.OK)
+        //            {
+        //                LoadAccounts();
+        //                MessageBox.Show("账户添加成功！", "成功",
+        //                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //                UpdateStatus();  // 调用更新总余额的函数
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"添加账户失败: {ex.Message}", "错误",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
@@ -125,7 +174,9 @@ namespace PersonalFinanceManager.UI.Forms
                         {
                             LoadAccounts();
                             MessageBox.Show("账户更新成功！", "成功",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            //UpdateStatus();  // 调用更新总余额的函数
+                            OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
                         }
                     }
                 }
@@ -136,6 +187,38 @@ namespace PersonalFinanceManager.UI.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        //private void btnDelete_Click(object sender, EventArgs e)
+        //{
+        //    if (dataGridViewAccounts.SelectedRows.Count == 0)
+        //    {
+        //        MessageBox.Show("请选择要删除的账户", "提示",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        int accountId = Convert.ToInt32(dataGridViewAccounts.SelectedRows[0].Cells["AccountID"].Value);
+        //        string accountName = dataGridViewAccounts.SelectedRows[0].Cells["AccountName"].Value.ToString();
+
+        //        if (MessageBox.Show($"确定要删除账户 '{accountName}' 吗？", "确认删除",
+        //            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+        //        {
+        //            if (_accountService.DeleteAccount(accountId))
+        //            {
+        //                LoadAccounts();
+        //                MessageBox.Show("账户删除成功！", "成功",
+        //                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"删除账户失败: {ex.Message}", "错误",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
@@ -156,9 +239,11 @@ namespace PersonalFinanceManager.UI.Forms
                 {
                     if (_accountService.DeleteAccount(accountId))
                     {
-                        LoadAccounts();
+                        LoadAccounts();  // 加载账户数据
+                        //UpdateStatus();   // 更新总余额显示
                         MessageBox.Show("账户删除成功！", "成功",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
                     }
                 }
             }
