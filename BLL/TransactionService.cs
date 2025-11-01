@@ -187,44 +187,17 @@ namespace PersonalFinanceManager.BLL
         //    _accountService.UpdateAccount(account);
         //}
 
-        //private void RecalculateAccountBalance(int accountId)
-        //{
-        //    var account = _accountService.GetAccountById(accountId);
-        //    if (account == null) return;
-
-        //    // 如果当前余额已经和初始金额一致，跳过计算
-        //    if (account.InitialAmount == account.CurrentBalance)
-        //    {
-        //        Console.WriteLine($"[Recalculate] 账户ID {accountId} 的余额无需更新，已匹配初始金额。");
-        //        return;
-        //    }
-
-        //    // 获取该账户所有交易记录
-        //    var transactions = _transactionRepository.GetTransactionsByAccountId(accountId);
-
-        //    decimal totalIncome = 0;
-        //    decimal totalExpense = 0;
-
-        //    // 计算所有交易的收入和支出
-        //    foreach (var t in transactions)
-        //    {
-        //        if (t.TransactionType == "收入") totalIncome += t.Amount;
-        //        else if (t.TransactionType == "支出") totalExpense += t.Amount;
-        //        // 转账逻辑可在此扩展
-        //    }
-
-        //    // 计算账户新余额：CurrentBalance = InitialAmount + 收入 - 支出
-        //    account.CurrentBalance = account.InitialAmount + totalIncome - totalExpense;
-
-        //    // 更新账户余额
-        //    _accountService.UpdateAccount(account);
-
-        //    Console.WriteLine($"[Recalculate] 账户ID {accountId} 余额重新计算: 初始金额 {account.InitialAmount}, 收入 {totalIncome}, 支出 {totalExpense}, 新余额 {account.CurrentBalance}");
-        //}
         private void RecalculateAccountBalance(int accountId)
         {
             var account = _accountService.GetAccountById(accountId);
             if (account == null) return;
+
+            // 如果账户的初始金额和当前余额已经设置，跳过不重新计算
+            if (account.InitialAmount == account.CurrentBalance)
+            {
+                Console.WriteLine($"[Recalculate] 账户余额无需更新，账户ID {accountId} 的初始金额与当前余额一致。");
+                return;
+            }
 
             // 获取该账户所有交易记录
             var transactions = _transactionRepository.GetTransactionsByAccountId(accountId);
@@ -243,11 +216,11 @@ namespace PersonalFinanceManager.BLL
             // 总余额计算：CurrentBalance = InitialAmount + (收入 - 支出)
             account.CurrentBalance = account.InitialAmount + totalIncome - totalExpense;
 
-            // 不再执行余额更新的操作
-            // _accountService.UpdateAccount(account);
+            // 更新账户余额
+            _accountService.UpdateAccount(account);
+
+            Console.WriteLine($"[Recalculate] 账户ID {accountId} 余额重新计算: 初始金额 {account.InitialAmount}, 收入 {totalIncome}, 支出 {totalExpense}, 新余额 {account.CurrentBalance}");
         }
-
-
 
         //public bool AddTransaction(Transaction transaction)
         //{

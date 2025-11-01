@@ -270,11 +270,41 @@ namespace PersonalFinanceManager.UI.Forms
             }
         }
 
+        //private void btnExport_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (dataGridViewReport.DataSource == null)
+        //        {
+        //            MessageBox.Show("没有可导出的数据", "提示",
+        //                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            return;
+        //        }
+
+        //        using (SaveFileDialog saveDialog = new SaveFileDialog())
+        //        {
+        //            saveDialog.Filter = "CSV文件 (*.csv)|*.csv";
+        //            saveDialog.FileName = $"财务报表_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+
+        //            if (saveDialog.ShowDialog() == DialogResult.OK)
+        //            {
+        //                // 这里可以添加导出CSV的逻辑
+        //                MessageBox.Show("导出功能待实现", "提示",
+        //                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"导出失败: {ex.Message}", "错误",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
         private void btnExport_Click(object sender, EventArgs e)
         {
             try
             {
-                if (dataGridViewReport.DataSource == null)
+                if (dataGridViewReport.DataSource == null || dataGridViewReport.Rows.Count == 0)
                 {
                     MessageBox.Show("没有可导出的数据", "提示",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -288,8 +318,36 @@ namespace PersonalFinanceManager.UI.Forms
 
                     if (saveDialog.ShowDialog() == DialogResult.OK)
                     {
-                        // 这里可以添加导出CSV的逻辑
-                        MessageBox.Show("导出功能待实现", "提示",
+                        using (var sw = new System.IO.StreamWriter(saveDialog.FileName, false, System.Text.Encoding.UTF8))
+                        {
+                            // 写入列标题
+                            for (int i = 0; i < dataGridViewReport.Columns.Count; i++)
+                            {
+                                sw.Write(dataGridViewReport.Columns[i].HeaderText);
+                                if (i < dataGridViewReport.Columns.Count - 1)
+                                    sw.Write(",");
+                            }
+                            sw.WriteLine();
+
+                            // 写入数据行
+                            foreach (DataGridViewRow row in dataGridViewReport.Rows)
+                            {
+                                if (row.IsNewRow) continue; // 跳过新行
+                                for (int i = 0; i < dataGridViewReport.Columns.Count; i++)
+                                {
+                                    var cellValue = row.Cells[i].Value?.ToString() ?? "";
+                                    // 如果值中含逗号或引号，用双引号包起来，双引号内部再用双引号转义
+                                    if (cellValue.Contains(",") || cellValue.Contains("\""))
+                                        cellValue = $"\"{cellValue.Replace("\"", "\"\"")}\"";
+                                    sw.Write(cellValue);
+                                    if (i < dataGridViewReport.Columns.Count - 1)
+                                        sw.Write(",");
+                                }
+                                sw.WriteLine();
+                            }
+                        }
+
+                        MessageBox.Show("导出成功", "提示",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
@@ -300,6 +358,7 @@ namespace PersonalFinanceManager.UI.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void btnOverview_Click(object sender, EventArgs e)
         {

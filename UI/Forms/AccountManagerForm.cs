@@ -47,36 +47,7 @@ namespace PersonalFinanceManager.UI.Forms
             LoadAccounts();
         }
 
-        //private void LoadAccounts()
-        //{
-        //    try
-        //    {
-        //        _accounts = _accountService.GetAllAccounts();
-        //        dataGridViewAccounts.Rows.Clear();
-
-        //        foreach (var account in _accounts)
-        //        {
-        //            dataGridViewAccounts.Rows.Add(
-        //                account.AccountID,
-        //                account.AccountName,
-        //                account.AccountType,
-        //                account.InitialAmount,      //新增初始金额列
-        //                account.CurrentBalance,
-        //                account.Currency,
-        //                account.BankName,
-        //                account.CreateTime.ToString("yyyy-MM-dd")
-        //            );
-        //        }
-
-        //        // 更新状态
-        //        UpdateStatus();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"加载账户数据失败: {ex.Message}", "错误",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
+    
         private void LoadAccounts()
         {
             try
@@ -205,28 +176,7 @@ namespace PersonalFinanceManager.UI.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        //private void btnAdd_Click(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        // 创建新增账户对话框
-        //        using (var form = new AccountEditForm())
-        //        {
-        //            if (form.ShowDialog() == DialogResult.OK)
-        //            {
-        //                LoadAccounts();
-        //                MessageBox.Show("账户添加成功！", "成功",
-        //                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //                UpdateStatus();  // 调用更新总余额的函数
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"添加账户失败: {ex.Message}", "错误",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
+
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
@@ -289,72 +239,7 @@ namespace PersonalFinanceManager.UI.Forms
             }
         }
 
-        //private void btnDelete_Click(object sender, EventArgs e)
-        //{
-        //    if (dataGridViewAccounts.SelectedRows.Count == 0)
-        //    {
-        //        MessageBox.Show("请选择要删除的账户", "提示",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        int accountId = Convert.ToInt32(dataGridViewAccounts.SelectedRows[0].Cells["AccountID"].Value);
-        //        string accountName = dataGridViewAccounts.SelectedRows[0].Cells["AccountName"].Value.ToString();
-
-        //        if (MessageBox.Show($"确定要删除账户 '{accountName}' 吗？", "确认删除",
-        //            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-        //        {
-        //            if (_accountService.DeleteAccount(accountId))
-        //            {
-        //                LoadAccounts();
-        //                MessageBox.Show("账户删除成功！", "成功",
-        //                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"删除账户失败: {ex.Message}", "错误",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
-
-        //private void btnDelete_Click(object sender, EventArgs e)
-        //{
-        //    if (dataGridViewAccounts.SelectedRows.Count == 0)
-        //    {
-        //        MessageBox.Show("请选择要删除的账户", "提示",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        int accountId = Convert.ToInt32(dataGridViewAccounts.SelectedRows[0].Cells["AccountID"].Value);
-        //        string accountName = dataGridViewAccounts.SelectedRows[0].Cells["AccountName"].Value.ToString();
-
-        //        if (MessageBox.Show($"确定要删除账户 '{accountName}' 吗？", "确认删除",
-        //            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-        //        {
-        //            if (_accountService.DeleteAccount(accountId))
-        //            {
-        //                LoadAccounts();  // 加载账户数据
-        //                //UpdateStatus();   // 更新总余额显示
-
-        //                MessageBox.Show("账户删除成功！", "成功",
-        //                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //                OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"删除账户失败: {ex.Message}", "错误",
-        //            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
+ 
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (dataGridViewAccounts.SelectedRows.Count == 0)
