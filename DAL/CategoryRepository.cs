@@ -1,16 +1,4 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-//namespace PersonalFinanceManager.DAL
-//{
-//    internal class CategoryRepository
-//    {
-//    }
-//}
-using System;
+﻿using System;
 using System.Data;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;

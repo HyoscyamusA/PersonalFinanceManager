@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using PersonalFinanceManager.Models;
+﻿using MySql.Data.MySqlClient;
 using PersonalFinanceManager.DAL;
+using PersonalFinanceManager.Models;
+using System;
+using System.Collections.Generic;
 
 namespace PersonalFinanceManager.BLL
 {
     public class AccountService
     {
         private readonly AccountRepository _accountRepository;
+        private readonly DatabaseHelper _databaseHelper;
 
         public AccountService()
         {
             _accountRepository = new AccountRepository();
+            _databaseHelper = new DatabaseHelper(); // 初始化
         }
 
         public List<Account> GetAllAccounts()
@@ -26,6 +29,24 @@ namespace PersonalFinanceManager.BLL
             }
         }
 
+        //public bool AddAccount(Account account)
+        //{
+        //    if (string.IsNullOrWhiteSpace(account.AccountName))
+        //        throw new ArgumentException("账户名称不能为空");
+
+        //    if (account.InitialAmount < 0)
+        //        throw new ArgumentException("初始金额不能为负数");
+
+        //    try
+        //    {
+        //        _accountRepository.AddAccount(account);
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception($"添加账户失败: {ex.Message}");
+        //    }
+        //}
         public bool AddAccount(Account account)
         {
             if (string.IsNullOrWhiteSpace(account.AccountName))
@@ -36,7 +57,34 @@ namespace PersonalFinanceManager.BLL
 
             try
             {
+                // 不直接把初始金额加到当前余额
+                account.CurrentBalance = 0;
+                account.CreateTime = DateTime.Now;
+
+                // 保存账户到数据库
                 _accountRepository.AddAccount(account);
+
+                // 如果初始金额大于0，则生成一条期初收入交易
+                if (account.InitialAmount > 0)
+                {
+                    var transactionService = new TransactionService();
+                    transactionService.AddTransaction(new Transaction
+                    {
+                        AccountID = account.AccountID,
+                        TransactionTime = DateTime.Now,
+                        Amount = account.InitialAmount,  // 初始金额
+                        TransactionType = "收入",
+                        CategoryID = 1, // 期初余额分类ID
+                        Remark = "账户创建时自动生成期初记录",
+                        Status = "正常",
+                        CreateTime = DateTime.Now
+                    });
+
+                    // 更新账户 CurrentBalance 为交易总额
+                    account.CurrentBalance = account.InitialAmount;
+                    _accountRepository.UpdateAccount(account);
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -44,6 +92,7 @@ namespace PersonalFinanceManager.BLL
                 throw new Exception($"添加账户失败: {ex.Message}");
             }
         }
+
 
         public bool UpdateAccount(Account account)
         {
@@ -104,5 +153,37 @@ namespace PersonalFinanceManager.BLL
                 throw new Exception($"获取账户信息失败: {ex.Message}");
             }
         }
+        public Account GetLatestAccount()
+        {
+            try
+            {
+                string sql = "SELECT * FROM accounts ORDER BY CreateTime DESC LIMIT 1";
+                var table = _databaseHelper.ExecuteQuery(sql);
+                if (table.Rows.Count == 0)
+                    return null;
+
+                var row = table.Rows[0];
+                return new Account
+                {
+                    AccountID = Convert.ToInt32(row["AccountID"]),
+                    AccountName = row["AccountName"].ToString(),
+                    AccountType = row["AccountType"].ToString(),
+                    InitialAmount = Convert.ToDecimal(row["InitialAmount"]),
+                    CurrentBalance = Convert.ToDecimal(row["CurrentBalance"]),
+                    Currency = row["Currency"].ToString(),
+                    BankName = row["BankName"].ToString(),
+                    CardNumber = row["CardNumber"].ToString(),
+                    Description = row["Description"].ToString(),
+                    CreateTime = Convert.ToDateTime(row["CreateTime"])
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"获取最新账户失败: {ex.Message}");
+            }
+        }
+
+
+
     }
 }

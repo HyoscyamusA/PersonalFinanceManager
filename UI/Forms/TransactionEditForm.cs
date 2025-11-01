@@ -107,7 +107,7 @@ namespace PersonalFinanceManager.UI.Forms
         {
             // 在设置任何 DataSource 之前先加载交易类型
             cmbTransactionType.Items.Clear();
-            cmbTransactionType.Items.AddRange(new object[] { "收入", "支出", "转账" });
+            cmbTransactionType.Items.AddRange(new object[] { "收入", "支出" });//, "转账" });
         }
 
         private void btnSave_Click(object sender, EventArgs e)

@@ -50,7 +50,7 @@ namespace PersonalFinanceManager.UI.Forms
         {
             // 设置交易类型筛选
             cmbFilterType.Items.Clear();
-            cmbFilterType.Items.AddRange(new object[] { "所有类型", "收入", "支出", "转账" });
+            cmbFilterType.Items.AddRange(new object[] { "所有类型", "收入", "支出" });//, "转账" });
             cmbFilterType.SelectedIndex = 0;
 
             // 设置日期范围

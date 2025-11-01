@@ -86,5 +86,17 @@ namespace PersonalFinanceManager.DAL
             }
             return dataTable;
         }
+
+        public int ExecuteNonQuery(string sql, MySqlParameter[] parameters, MySqlConnection connection, MySqlTransaction transaction)
+        {
+            using (var cmd = new MySqlCommand(sql, connection, transaction))
+            {
+                if (parameters != null)
+                    cmd.Parameters.AddRange(parameters);
+                return cmd.ExecuteNonQuery();
+            }
+        }
+
+
     }
 }
