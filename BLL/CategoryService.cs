@@ -1,16 +1,4 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-//namespace PersonalFinanceManager.BLL
-//{
-//    internal class CategoryService
-//    {
-//    }
-//}
-using System;
+﻿using System;
 using System.Collections.Generic;
 using PersonalFinanceManager.Models;
 using PersonalFinanceManager.DAL;

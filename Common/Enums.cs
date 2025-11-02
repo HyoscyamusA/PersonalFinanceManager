@@ -15,8 +15,8 @@
         public enum TransactionType
         {
             收入,
-            支出,
-            转账
+            支出
+            //转账
         }
 
         public enum BudgetStatus

@@ -39,6 +39,7 @@ namespace PersonalFinanceManager.BLL
 
             try
             {
+                
                 _accountRepository.AddAccount(account);
                 return true;
             }

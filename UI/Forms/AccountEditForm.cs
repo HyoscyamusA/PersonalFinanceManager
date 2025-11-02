@@ -19,6 +19,8 @@ namespace PersonalFinanceManager.UI.Forms
             _account = new Account();
         }
 
+        
+
         public AccountEditForm(Account account) : this()
         {
             _account = account;
@@ -46,94 +48,7 @@ namespace PersonalFinanceManager.UI.Forms
             }
         }
 
-        //private void btnSave_Click(object sender, EventArgs e)
-        //{
-        //    if (!ValidateInput())
-        //        return;
 
-        //    try
-        //    {
-        //        // 更新账户对象
-        //        _account.AccountName = txtAccountName.Text.Trim();
-        //        _account.AccountType = cmbAccountType.Text;
-        //        _account.InitialAmount = decimal.Parse(txtInitialAmount.Text);
-        //        _account.Currency = txtCurrency.Text.Trim();
-        //        _account.BankName = string.IsNullOrWhiteSpace(txtBankName.Text) ? null : txtBankName.Text.Trim();
-        //        _account.CardNumber = string.IsNullOrWhiteSpace(txtCardNumber.Text) ? null : txtCardNumber.Text.Trim();
-        //        _account.Description = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
-
-        //        if (_isEditMode)
-        //        {
-        //            // 更新现有账户
-        //            if (_accountService.UpdateAccount(_account))
-        //            {
-        //                this.DialogResult = DialogResult.OK;
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show("更新账户失败", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // 新增账户
-        //            _accountService.AddAccount(_account);
-        //            this.DialogResult = DialogResult.OK;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"保存失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
-        //private void btnSave_Click(object sender, EventArgs e)
-        //{
-        //    if (!ValidateInput())
-        //        return;
-
-        //    try
-        //    {
-        //        // 更新账户对象
-        //        _account.AccountName = txtAccountName.Text.Trim();
-        //        _account.AccountType = cmbAccountType.Text;
-        //        _account.InitialAmount = decimal.Parse(txtInitialAmount.Text);
-        //        _account.Currency = txtCurrency.Text.Trim();
-        //        _account.BankName = string.IsNullOrWhiteSpace(txtBankName.Text) ? null : txtBankName.Text.Trim();
-        //        _account.CardNumber = string.IsNullOrWhiteSpace(txtCardNumber.Text) ? null : txtCardNumber.Text.Trim();
-        //        _account.Description = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
-
-        //        // 只有在初始余额和当前余额一致时才可以更新
-        //        if (_account.InitialAmount != _account.CurrentBalance)
-        //        {
-        //            MessageBox.Show("只有当初始余额与当前余额一致时，才能修改账户信息", "错误",
-        //                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //            return;
-        //        }
-
-        //        if (_isEditMode)
-        //        {
-        //            // 更新现有账户
-        //            if (_accountService.UpdateAccount(_account))
-        //            {
-        //                this.DialogResult = DialogResult.OK;
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show("更新账户失败", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // 新增账户
-        //            _accountService.AddAccount(_account);
-        //            this.DialogResult = DialogResult.OK;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"保存失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
         private void btnSave_Click(object sender, EventArgs e)
 {
     if (!ValidateInput())
@@ -141,22 +56,24 @@ namespace PersonalFinanceManager.UI.Forms
 
     try
     {
-        // 更新账户对象
+         // 仅在编辑账户时验证 InitialAmount 和 CurrentBalance 是否一致
+         if (_isEditMode && _account.InitialAmount != _account.CurrentBalance)
+         {
+               MessageBox.Show("只有当初始余额与当前余额一致时，才能修改账户信息", "错误",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+               return;
+         }
+                // 更新账户对象
         _account.AccountName = txtAccountName.Text.Trim();
         _account.AccountType = cmbAccountType.Text;
         _account.InitialAmount = decimal.Parse(txtInitialAmount.Text);
+        _account.CurrentBalance=_account.InitialAmount;
         _account.Currency = txtCurrency.Text.Trim();
         _account.BankName = string.IsNullOrWhiteSpace(txtBankName.Text) ? null : txtBankName.Text.Trim();
         _account.CardNumber = string.IsNullOrWhiteSpace(txtCardNumber.Text) ? null : txtCardNumber.Text.Trim();
         _account.Description = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
 
-        // 仅在编辑账户时验证 InitialAmount 和 CurrentBalance 是否一致
-        if (_isEditMode && _account.InitialAmount != _account.CurrentBalance)
-        {
-            MessageBox.Show("只有当初始余额与当前余额一致时，才能修改账户信息", "错误",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
-        }
+
 
         if (_isEditMode)
         {

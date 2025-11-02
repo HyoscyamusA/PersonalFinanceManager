@@ -202,6 +202,7 @@ namespace PersonalFinanceManager.UI.Forms
                             MessageBox.Show("账户更新成功！", "成功",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                             // 编辑完账户后，同步交易记录
+
                             try
                             {
                                 var updatedAccount = _accountService.GetAccountById(accountId);
@@ -220,6 +221,7 @@ namespace PersonalFinanceManager.UI.Forms
                                         Status = "正常",
                                         CreateTime = DateTime.Now
                                     });
+                                    OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
                                 }
                             }
                             catch (Exception ex)
@@ -227,7 +229,7 @@ namespace PersonalFinanceManager.UI.Forms
                                 MessageBox.Show($"账户更新成功，但记录调整交易失败: {ex.Message}", "警告",
                                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
-                            OnAccountUpdated?.Invoke(); // 触发事件，通知更新总余额
+                            
                         }
                     }
                 }

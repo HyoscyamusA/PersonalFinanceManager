@@ -1,5 +1,4 @@
-﻿
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using PersonalFinanceManager.DAL;
 using PersonalFinanceManager.Models;
 using System;
@@ -128,9 +127,6 @@ public class AccountRepository
 
         return result;
     }
-
-
-
 
 
     public bool DeleteAccount(int accountId)
